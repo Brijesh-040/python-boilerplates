@@ -1,12 +1,22 @@
-from fastapi import FastAPI, HTTPException
-from bson import json_util
+from typing import Annotated
+from fastapi import Body, FastAPI, HTTPException
+from pymongo.results import DeleteResult
+from pymongo.collection import Collection
+from bson import json_util, ObjectId
+from pydantic import BaseModel, Field
+
 import json
 
 from databas import db
 collection_list = db.list_collection_names()
-userModel = db['user']
+userModel: Collection = db['user']
 
 app = FastAPI()
+
+
+class userSchema(BaseModel):
+    firstName: str
+    lastName: str
 
 
 @app.get("/")
@@ -16,18 +26,50 @@ async def root():
     return {"message": collection_list[0]+' collection connected successfully'}
 
 
-@app.post("/user/create")
+@app.post("/user/createUser", tags=['user'])
 async def create_user(firstName: str | None = None, lastName: str | None = None):
-    return userModel.insert_one({firstName: firstName, lastName: lastName})
+    userData = userModel.insert_one({firstName: firstName, lastName: lastName})
+    if userData:
+        return ('user create successfully')
 
 
-@app.get("/user/getuserList")
+@app.get("/user/getUserList", tags=['user'])
 async def get_user():
     userData = json.loads(json_util.dumps(userModel.find()))
-    print(userData)
     # array null check => if not array
-    # object null check => if object is None
-    if not userData: 
-        raise HTTPException(status_code=404, detail="user not found")
+    if not userData:
+        raise HTTPException(status_code=404, message="user not found")
     else:
         return userData
+
+
+@app.get("/user/getUser/{userId}", tags=['user'])
+async def get_user(userId: str):
+    userData = json.loads(json_util.dumps(
+        userModel.find_one({"_id": ObjectId(userId)})))
+    # object null check => if object is None
+    if userData is None:
+        raise HTTPException(status_code=404, message="user not found")
+    else:
+        return userData
+
+
+@app.put("/user/updateUser/{userId}", tags=['user'])
+async def update_user(userId: str, payload: Annotated[userSchema, Body(embed=True)]):
+    updatePaylod = {
+        "$set": dict(payload)
+    }
+    print(updatePaylod)
+    userData = json.loads(json_util.dumps(
+        userModel.find_one_and_update({"_id": ObjectId(userId)}, updatePaylod, return_document=True)))
+    print(userData)
+    return (userData)
+
+
+@app.delete("/user/deleteUser/{userId}", tags=['user'])
+async def delete_user(userId: str):
+    userData: DeleteResult = userModel.delete_one({"_id": ObjectId(userId)})
+    if userData.deleted_count > 0:
+        raise HTTPException(status_code=404, message="user not found")
+    else:
+        return ({"message": "user deleted successfully"})
