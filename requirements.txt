@@ -1,0 +1,13 @@
+fastapi==0.97.0
+uvicorn[standard]==0.22.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+PyJWT==2.7.0
+psycopg2-binary==2.9.6
+pydantic[email]==1.10.9
+pymongo==4.3.3
+pytz
+google-cloud-bigquery
+oauth2client
+
