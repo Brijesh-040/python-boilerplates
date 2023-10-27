@@ -27,8 +27,8 @@ async def root():
 
 
 @app.post("/user/createUser", tags=['user'])
-async def create_user(firstName: str | None = None, lastName: str | None = None):
-    userData = userModel.insert_one({firstName: firstName, lastName: lastName})
+async def create_user(payload: Annotated[userSchema, Body(embed=False)]):
+    userData = userModel.insert_one(dict(payload))
     if userData:
         return ('user create successfully')
 
@@ -55,14 +55,14 @@ async def get_user(userId: str):
 
 
 @app.put("/user/updateUser/{userId}", tags=['user'])
-async def update_user(userId: str, payload: Annotated[userSchema, Body(embed=True)]):
+async def update_user(userId: str, payload: Annotated[userSchema, Body(embed=False)]):
     updatePaylod = {
         "$set": dict(payload)
     }
-    print(updatePaylod)
+    # print(updatePaylod)
     userData = json.loads(json_util.dumps(
         userModel.find_one_and_update({"_id": ObjectId(userId)}, updatePaylod, return_document=True)))
-    print(userData)
+    # print(userData)
     return (userData)
 
 
