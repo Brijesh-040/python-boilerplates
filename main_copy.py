@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 import json
 
-from databas import db
+from database.database import db
 collection_list = db.list_collection_names()
 userModel: Collection = db['user']
 
