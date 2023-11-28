@@ -18,13 +18,13 @@ token_scheme = bearer.HTTPBearer()
 def signup(payload: user_model.SignUp):
     try:
         user = user_service.signup(payload)
-        if user: 
+        if user:
             return {
                 "statusCode": 200,
                 "status": 'success',
                 "message": 'Congratulations, your account has been successfully created.',
             }
-        else: 
+        else:
             return {
                 "statusCode": 400,
                 "error": 'bad_request',
@@ -34,11 +34,25 @@ def signup(payload: user_model.SignUp):
         raise UnicornException(str(e))
 
 
-# @router.get("/get_user")
-# def getUser(userId: str):
-#         userData = json.loads(json_util.dumps(userModel.find()))
-#         # array null check => if not array
-#         if not userData:
-#             raise HTTPException(status_code=404, message="user not found")
-#         else:
-#             return userData
+@router.post("/log_in")
+def login(payload: user_model.Login):
+    try:
+        return user_service.signIn(payload)
+    except Exception as e:
+        raise UnicornException(str(e))
+
+
+@router.get("/get_user/{userId}")
+def getUserDetails(userId: str):
+    try: 
+        return user_service.getUserDetails(userId)
+    except Exception as e:
+        raise UnicornException(str(e))
+    
+
+@router.get("/get_user")
+def getUserDetails():
+    try: 
+        return user_service.getUser()
+    except Exception as e:
+        raise UnicornException(str(e))

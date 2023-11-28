@@ -58,8 +58,11 @@ app.include_router(api_router)
 
 @app.get("/")
 def read_root():
+    current_time = datetime.datetime.now(pytz.utc)
+    ist = pytz.timezone('Asia/Kolkata')
+    startup_time = current_time.astimezone(ist).strftime("%d/%m/%Y, %H:%M:%S %p")
     return {
-        "up": startup_time,
+        "time": startup_time,
         # "database": db2
         # ,"database2": get_db2_config()
     }

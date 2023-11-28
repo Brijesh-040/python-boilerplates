@@ -10,7 +10,6 @@ class SignUp(BaseModel):
     email: EmailStr
     password: str
     cPassword: str
-    roles: str
 
     @validator('cPassword')
     def passwords_match(cls, v, values, **kwargs):

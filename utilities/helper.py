@@ -1,5 +1,6 @@
 from fastapi import Response, Depends
 from fastapi.security import HTTPBearer
+import jwt
 from core.config import get_authentication_url
 from database.database import db
 import requests
@@ -33,13 +34,18 @@ def get_user_by_userName(userName: str, _id: str = None):
 
 
 def get_user_by_email_userName(userName: str, _id: str = None):
-    query_obj = {"userName": userName, "email": userName}
+    query_obj = {
+        "$or": [
+            {"userName": userName},
+            {"email": userName}
+        ]
+    }
     if _id is not None:
         query_obj.update({"_id": ObjectId(_id)})
     query = user_collection.find_one(query_obj)
     return json.loads(json_util.dumps(query))
-    
-    
+
+
 def check_auth(response: Response, token: str = Depends(token_scheme)):
     try:
         if token and token.credentials is not None:
@@ -71,3 +77,8 @@ def remove_special_fields(data):
         return [remove_special_fields(item) for item in data]
     else:
         return data
+
+
+def generate_token(payload):
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return token
