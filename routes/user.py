@@ -1,15 +1,10 @@
-from fastapi import APIRouter, Depends
-from core.config import get_authentication_url
+from fastapi import APIRouter
 from fastapi.security import HTTPBearer
 from utilities.error_handler import UnicornException
-from utilities.helper import check_auth, remove_special_fields
 from database.services import user_service
 from utilities import bearer
 from database.models import user_model
-import requests
-import json
 
-config = get_authentication_url()
 router = APIRouter()
 token_scheme = bearer.HTTPBearer()
 
@@ -44,15 +39,15 @@ def login(payload: user_model.Login):
 
 @router.get("/get_user/{userId}")
 def getUserDetails(userId: str):
-    try: 
+    try:
         return user_service.getUserDetails(userId)
     except Exception as e:
         raise UnicornException(str(e))
-    
+
 
 @router.get("/get_user")
 def getUserDetails():
-    try: 
+    try:
         return user_service.getUser()
     except Exception as e:
         raise UnicornException(str(e))

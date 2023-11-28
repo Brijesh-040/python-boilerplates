@@ -60,21 +60,21 @@ def signIn(login_details):
         raise e
 
 
-def getUserDetails(userId): 
+def getUserDetails(userId):
     try:
         if userId:
-            user = json.loads(json_util.dumps(collection.find_one({"_id": ObjectId(userId) })))
-            print(user, ">>>>>>>>>>>>>>>>")
-            return { 
-                "userDeatils" : user
+            user = json.loads(json_util.dumps(
+                collection.find_one({"_id": ObjectId(userId)})))
+            return {
+                "userDeatils": user
             }
-        else: 
+        else:
             raise Exception('User not exists in database')
     except Exception as e:
         raise e
-    
-    
-def getUser(): 
+
+
+def getUser():
     try:
         return json.loads(json_util.dumps(collection.find({})))
     except Exception as e:

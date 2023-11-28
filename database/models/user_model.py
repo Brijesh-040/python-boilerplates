@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator
 from fastapi import HTTPException
-from typing import Optional
 
 
 class SignUp(BaseModel):
