@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from utilities.error_handler import UnicornException
 from database.services import user_service
 from utilities import bearer
 from database.models import user_model
+from utilities.helper import check_auth
 
 router = APIRouter()
 token_scheme = bearer.HTTPBearer()
@@ -38,7 +39,7 @@ def login(payload: user_model.Login):
 
 
 @router.get("/get_user/{userId}")
-def getUserDetails(userId: str):
+def getUserDetails(userId: str, current_user = Depends(check_auth)):
     try:
         return user_service.getUserDetails(userId)
     except Exception as e:
@@ -46,8 +47,18 @@ def getUserDetails(userId: str):
 
 
 @router.get("/get_user")
-def getUserDetails():
+def getUserDetails(current_user = Depends(check_auth)):
     try:
         return user_service.getUser()
     except Exception as e:
+        raise UnicornException(str(e))
+
+
+@router.get('/me')    
+def me(current_user = Depends(check_auth)):
+   try:
+        if current_user:
+            current_user['success']=True
+            return current_user
+   except Exception as e: 
         raise UnicornException(str(e))

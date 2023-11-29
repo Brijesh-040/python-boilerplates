@@ -4,6 +4,7 @@ from database.database import db
 from utilities import helper
 from bson import json_util
 import json
+import bcrypt
 
 from utilities.error_handler import UnicornException
 
@@ -45,9 +46,7 @@ def signIn(login_details):
         user = helper.get_user_by_email_userName(payload['userName'])
         if user:
             if pwd_context.verify(payload['password'], user['password']):
-                token_payload = {
-                    'email': user['email'], '_id': user['_id']['$oid']}
-                token = helper.generate_token(token_payload)
+                token = helper.generate_token(dict(user))
                 return {
                     "user": user,
                     "token": token
