@@ -17,12 +17,23 @@ class SignUp(BaseModel):
             raise HTTPException(
                 status_code=401, detail='Password do not match.')
         return v
+    
+    @validator("userName", pre=True, always=True)
+    def strip_userName(cls, value):
+        return value.strip()
+    
+    @validator("email", pre=True, always=True)
+    def strip_email(cls, value):
+        return value.strip()
 
 
 class Login(BaseModel):
     userName: str
-    # email: EmailStr
     password: str
+    
+    @validator("userName", pre=True, always=True)
+    def strip_userName(cls, value):
+        return value.strip()
 
 
 class updateUser(BaseModel):
