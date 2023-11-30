@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, validator
 from fastapi import HTTPException
+from typing import Optional
 
 
 class SignUp(BaseModel):
@@ -24,10 +25,10 @@ class Login(BaseModel):
     password: str
 
 
-class UpdateProfile(BaseModel):
-    firstName: str
-    lastName: str
-    userName: str
-    email: EmailStr
-    # password: str
-    roles: str
+class updateUser(BaseModel):
+    firstName: Optional[str]
+    lastName: Optional[str]
+    userName: Optional[str]
+    email: Optional[EmailStr]
+    roles: Optional[str]
+    password: str

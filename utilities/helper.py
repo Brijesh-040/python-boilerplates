@@ -88,3 +88,13 @@ def check_auth(token: str = Depends(token_scheme)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except Exception as e:
         raise UnicornException(str(e))
+    
+    
+def create_update_payload(data): 
+    if isinstance(data, dict):
+        new_data = {key: value for key, value in data.items() if value is not None}
+        return { 
+            "$set": new_data
+        }
+    else:
+        return data

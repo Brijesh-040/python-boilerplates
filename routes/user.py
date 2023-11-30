@@ -52,6 +52,14 @@ def getUserDetails(current_user = Depends(check_auth)):
         return user_service.getUser()
     except Exception as e:
         raise UnicornException(str(e))
+    
+
+@router.put("/update_user/{userId}")
+def updateUser(userId: str, payload: user_model.updateUser, current_user = Depends(check_auth)): 
+    try:
+        return user_service.updateUser(userId, dict(payload))
+    except Exception as e:
+        raise UnicornException(str(e))
 
 
 @router.get('/me')    

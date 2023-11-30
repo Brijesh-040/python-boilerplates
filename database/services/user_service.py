@@ -46,6 +46,7 @@ def signIn(login_details):
         user = helper.get_user_by_email_userName(payload['userName'])
         if user:
             if pwd_context.verify(payload['password'], user['password']):
+                user.pop('password')
                 token = helper.generate_token(dict(user))
                 return {
                     "user": user,
@@ -63,7 +64,7 @@ def getUserDetails(userId):
     try:
         if userId:
             user = json.loads(json_util.dumps(
-                collection.find_one({"_id": ObjectId(userId)})))
+                collection.find_one({"_id": ObjectId(userId)},{"password": 0})))
             return {
                 "userDeatils": user
             }
@@ -75,6 +76,28 @@ def getUserDetails(userId):
 
 def getUser():
     try:
-        return json.loads(json_util.dumps(collection.find({})))
+        return json.loads(json_util.dumps(collection.find({},{"password": 0})))
+    except Exception as e:
+        raise e
+
+
+def updateUser(userId: str, payload): 
+    try:
+        user = json.loads(json_util.dumps(collection.find_one({"_id": ObjectId(userId)})))
+        if user:
+            print(user)
+            if pwd_context.verify(payload['password'], user['password']):
+                payload.pop('password')
+                payloadupdate = helper.create_update_payload(dict(payload))
+                updated_client = collection.find_one_and_update(
+                    {"_id": ObjectId(userId)},
+                    payloadupdate,
+                    return_document=True,
+                )
+                return json.loads(json_util.dumps(updated_client))
+            else:
+                raise Exception('Please enter valid password!')
+        else:
+            raise Exception('User not found!')
     except Exception as e:
         raise e
